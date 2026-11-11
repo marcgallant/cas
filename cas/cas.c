@@ -3,6 +3,9 @@
 #include <getopt.h>
 #include <stddef.h>
 
+
+#include "configschema.h"
+
 int main(int argc, char *argv[]) {
     //TODO
     int opt;
@@ -12,6 +15,7 @@ int main(int argc, char *argv[]) {
         {"version",    no_argument,       NULL, 'v' },
     };
     int option_index = 0;
+
     while ((opt = getopt_long(argc, argv, "lh", long_options, &option_index)) != -1) {
         switch (opt) {
             case 0:
@@ -30,6 +34,8 @@ int main(int argc, char *argv[]) {
                 break;
         }
     } 
+
+    load_schema();
         
     return 0;
 }

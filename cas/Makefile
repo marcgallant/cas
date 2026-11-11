@@ -1,12 +1,16 @@
-CFLAGS = -fPIC -Wall -Wextra -Werror -std=c11 -I include
+CC = gcc
+CFLAGS = -fPIC -Wall -Wextra -Werror -std=c11 -I include -g
+LDFLAGS = -L/usr/local/lib
+LDLIBS = -lcjson
 
-SRC = cas.c
+SRC = configschema.c cas.c
 OBJ = $(SRC:.c=.o)
-BIN = $(SRC:.c=)
+BIN = cas
 
 all: $(BIN)
 
 $(BIN): $(OBJ)
+	$(CC) $(OBJ) $(LDFLAGS) $(LDLIBS) -o $(BIN)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
