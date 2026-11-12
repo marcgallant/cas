@@ -8,11 +8,9 @@
 int file_version = 0;
 int compatible_file_version = 0;
 
-//TODO return error code
-void load_schema() {
+int load_schema() {
     FILE *f = fopen("schema-kas.json", "rb");
-    if (f == NULL)
-        return;
+    if (f == NULL) return 0;
 
     fseek(f, 0, SEEK_END);
     long fsize = ftell(f);
@@ -26,63 +24,31 @@ void load_schema() {
 
     cJSON *json = cJSON_Parse(string);
     const char *error_ptr = cJSON_GetErrorPtr();
-    if (error_ptr != NULL)
-    {
-        fprintf(stderr, "Error before: %s\n", error_ptr);
-        return;
-    }
-
-    //header_node = CONFIGSCHEMA['properties']['header'];
-    //__file_version__ = version_node["maximum"]
-    //__compatible_file_version__ = version_node["minimum"]
+    if (error_ptr != NULL) return 0;
 
     const cJSON *properties = cJSON_GetObjectItemCaseSensitive(json, "properties");
-    if (!cJSON_IsObject(properties)) {
-        printf("error1\n");
-        return;
-    }
+    if (!cJSON_IsObject(properties)) return 0;
 
     const cJSON *header = cJSON_GetObjectItemCaseSensitive(properties, "header");
-    if (!cJSON_IsObject(properties)) {
-        printf("error2\n");
-        return;
-    }
+    if (!cJSON_IsObject(properties)) return 0;
 
-    const cJSON *properties2 = cJSON_GetObjectItemCaseSensitive(header, "properties");
-    if (!cJSON_IsObject(properties2)) {
-        printf("error3\n");
-        return;
-    }
+    const cJSON *properties_node = cJSON_GetObjectItemCaseSensitive(header, "properties");
+    if (!cJSON_IsObject(properties_node))  return 0;
 
-    const cJSON *version = cJSON_GetObjectItemCaseSensitive(properties2, "version");
-    if (!cJSON_IsObject(version)) {
-        printf("error4\n");
-        return;
-    }
+    const cJSON *version = cJSON_GetObjectItemCaseSensitive(properties_node, "version");
+    if (!cJSON_IsObject(version)) return 0;
 
-    const cJSON *anyOf = cJSON_GetObjectItemCaseSensitive(version, "anyOf");
-    if (!cJSON_IsArray(anyOf) || cJSON_GetArraySize(anyOf) <= 1) {
-        printf("error5\n");
-        return;
-    }
+    const cJSON *list = cJSON_GetObjectItemCaseSensitive(version, "anyOf");
+    if (!cJSON_IsArray(list) || cJSON_GetArraySize(list) <= 1) return 0;
 
-    const cJSON *version_node = cJSON_GetArrayItem(anyOf, 1);
-    if (!cJSON_IsObject(version_node))  {
-        printf("error6\n");
-        return;
-    }
+    const cJSON *version_node = cJSON_GetArrayItem(list, 1);
+    if (!cJSON_IsObject(version_node)) return 0;
  
     const cJSON *maximum = cJSON_GetObjectItemCaseSensitive(version_node, "maximum");
-    if (!cJSON_IsNumber(maximum)) {
-        printf("error7\n");
-        return;
-    }
+    if (!cJSON_IsNumber(maximum)) return 0;
 
     const cJSON *minimum = cJSON_GetObjectItemCaseSensitive(version_node, "minimum");
-    if (!cJSON_IsNumber(minimum)) {
-        printf("error8\n");
-        return;
-    }
+    if (!cJSON_IsNumber(minimum)) return 0;
 
     file_version = maximum->valueint;
     compatible_file_version = minimum->valueint;
@@ -90,5 +56,5 @@ void load_schema() {
     cJSON_Delete(json);
 
     free(string);
-    return;
+    return 1;
 }
