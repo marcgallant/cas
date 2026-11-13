@@ -1,7 +1,15 @@
 CC = gcc
-CFLAGS = -fPIC -Wall -Wextra -Werror -std=c11 -I include -g
+CFLAGS = -fPIC -Wall -Wextra -Werror -std=c11 -g -I utils
 
-SRC = cJSON.c configschema.c cas.c
+SRC = utils/hash_map/hash.c \
+      utils/hash_map/hash_map.c \
+      utils/dlist/dlist.c \
+      utils/arg_parser/arg_parser.c \
+      cJSON.c \
+      configschema.c \
+      plugins/plugins.c \
+      plugins/clean.c \
+      cas.c
 OBJ = $(SRC:.c=.o)
 BIN = cas
 

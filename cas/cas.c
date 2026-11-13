@@ -7,6 +7,8 @@
 
 #include "configschema.h"
 
+#include <arg_parser/arg_parser.h>
+
 typedef enum {
     LOG_DEBUG = 0,
     LOG_INFO,
@@ -30,7 +32,7 @@ void print_usage() {}
 
 int main(int argc, char *argv[]) {
     //TODO
-    int opt;
+    /*int opt;
     static struct option long_options[] = { 
         { "log-level", required_argument, NULL, 'l' },
         { "help",      no_argument,       NULL, 'h' },
@@ -85,8 +87,19 @@ int main(int argc, char *argv[]) {
                     printf("kas: error: unrecognized arguments: %s\n", argv[optind - 1]);
                 return 2;
         }
-    } 
+    }*/
 
+    struct arg_parser *parser = arg_parser_init("kas - setup tool for bitbake based project");
+    add_argument(parser, "help", 'h', NULL); 
+    add_argument(parser, "version", 0, NULL); 
+    
+    char *choices[] = { "debug", "info", "warning", "error", "critical", NULL };
+    add_argument(parser, "log-level", 0,  choices); 
+    
+    usage(parser);
+    parse(parser, argc, argv);
+
+    arg_parser_destroy(parser);
         
-    return ret;
+    return 0;
 }
